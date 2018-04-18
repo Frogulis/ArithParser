@@ -50,9 +50,17 @@ class ArithParser {
         ArithParser parser = new ArithParser();
         try {
             ArrayList<Token> tokens = parser.tokenize(args[0]);
-            System.out.println(tokens.size() + " tokens:");
-            for (Token t : tokens) {
-                System.out.println(t.type + ": " + t.value);
+            Expression sentence = parser.parseTokens(tokens);
+            Expression pointer = sentence;
+            while (true) {
+                System.out.print(pointer.t);
+                if (pointer.x != null) {
+                    System.out.print(pointer.x.o);
+                    pointer = pointer.x.e;
+                }
+                else {
+                    break;
+                }
             }
         }
         catch (Exception e) {
@@ -104,9 +112,36 @@ class ArithParser {
         return output;
     }
 
-    private Expression parseTokens(ArrayList<Token> tokens)
+    private Expression parseTokens(ArrayList<Token> tokens) throws Exception
     {
-        //
-        return null;
+        return parseExpression(tokens);
+    }
+
+    private Expression parseExpression(ArrayList<Token> tokens) throws Exception
+    {
+        if (tokens.size() == 0) {
+            return null;
+        }
+        Expression result = new Expression();
+        if (tokens.get(0).type != "TOKEN_NUMBER") {
+            throw new Exception("Expected number, got: " + tokens.get(0).value);
+        }
+        result.t = tokens.get(0).value;
+        result.x = parseSuffix(new ArrayList<Token>(tokens.subList(1, tokens.size())));
+        return result;
+    }
+
+    private Suffix parseSuffix(ArrayList<Token> tokens) throws Exception
+    {
+        if (tokens.size() == 0) {
+            return null;
+        }
+        Suffix result = new Suffix();
+        if (tokens.get(0).type != "TOKEN_OPERATOR") {
+            throw new Exception("Expected operator, got: " + tokens.get(0).value);
+        }
+        result.o = tokens.get(0).value;
+        result.e = parseExpression(new ArrayList<Token>(tokens.subList(1, tokens.size())));
+        return result;
     }
 };
