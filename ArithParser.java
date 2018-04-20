@@ -51,17 +51,7 @@ class ArithParser {
         try {
             ArrayList<Token> tokens = parser.tokenize(args[0]);
             Expression sentence = parser.parseTokens(tokens);
-            Expression pointer = sentence;
-            while (true) {
-                System.out.print(pointer.t);
-                if (pointer.x != null) {
-                    System.out.print(pointer.x.o);
-                    pointer = pointer.x.e;
-                }
-                else {
-                    break;
-                }
-            }
+            System.out.println(parser.evaluate(sentence));
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -142,6 +132,33 @@ class ArithParser {
         }
         result.o = tokens.get(0).value;
         result.e = parseExpression(new ArrayList<Token>(tokens.subList(1, tokens.size())));
+        return result;
+    }
+
+    private int evaluate(Expression expr)
+    {
+        Expression pointer = expr;
+        int result = Integer.parseInt(pointer.t, 10);
+        while (true) {
+            if (pointer.x != null) {
+                if (pointer.x.o.equals("+")) {
+                    result += Integer.parseInt(pointer.x.e.t, 10);
+                }
+                else if (pointer.x.o.equals("-")) {
+                    result -= Integer.parseInt(pointer.x.e.t, 10);
+                }
+                else if (pointer.x.o.equals("*")) {
+                    result *= Integer.parseInt(pointer.x.e.t, 10);
+                }
+                else if (pointer.x.o.equals("/")) {
+                    result /= Integer.parseInt(pointer.x.e.t, 10);
+                }
+                pointer = pointer.x.e;
+            }
+            else {
+                break;
+            }
+        }
         return result;
     }
 };
